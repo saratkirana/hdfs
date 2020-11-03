@@ -153,6 +153,8 @@ func (c *NamenodeConnection) resolveConnection() error {
 			c.dialFunc = (&net.Dialer{}).DialContext
 		}
 
+		fmt.Println("Test1 ", host.address)
+
 		c.host = host
 		c.conn, err = c.dialFunc(context.Background(), "tcp", host.address)
 		if err != nil {
