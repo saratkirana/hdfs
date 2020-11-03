@@ -172,9 +172,13 @@ func (c *NamenodeConnection) getKerberosTicket() (spnego.NegTokenInit, krbtypes.
 	spn := replaceSPNHostWildcard(c.kerberosServicePrincipleName, host)
 
 	fmt.Printf("getKerberosTicket %+v\n", spn)
+	realm := c.kerberosClient.Config.ResolveRealm("cmmaster002.usprz17.pie.apple.com")
+	fmt.Printf("getKerberosTicket realm %+v\n", realm)
 
 	ticket, key, err := c.kerberosClient.GetServiceTicket(spn)
 	if err != nil {
+		fmt.Printf("getKerberosTicket err %+v\n", err)
+
 		return spnego.NegTokenInit{}, key, err
 	}
 
