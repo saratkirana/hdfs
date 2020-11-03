@@ -170,7 +170,7 @@ func (c *NamenodeConnection) resolveConnection() error {
 	}
 
 	if c.conn == nil {
-		return fmt.Errorf("no available namenodes: %s", err)
+		return fmt.Errorf("no available namenodes: %s, %v+", err, c)
 	}
 
 	return nil
