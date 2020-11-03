@@ -158,6 +158,8 @@ func (c *NamenodeConnection) resolveConnection() error {
 		c.host = host
 		c.conn, err = c.dialFunc(context.Background(), "tcp", host.address)
 		if err != nil {
+			fmt.Println("Err in dailFunc ", host.address)
+
 			c.markFailure(err)
 			continue
 		}
@@ -172,7 +174,7 @@ func (c *NamenodeConnection) resolveConnection() error {
 	}
 
 	if c.conn == nil {
-		return fmt.Errorf("no available namenodes: %s, %v+", err, c)
+		return fmt.Errorf("no available namenodes: %s, %+v", err, c)
 	}
 
 	return nil

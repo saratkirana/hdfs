@@ -171,6 +171,8 @@ func (c *NamenodeConnection) getKerberosTicket() (spnego.NegTokenInit, krbtypes.
 	host, _, _ := net.SplitHostPort(c.host.address)
 	spn := replaceSPNHostWildcard(c.kerberosServicePrincipleName, host)
 
+	fmt.Printf("getKerberosTicket %+v\n", spn)
+
 	ticket, key, err := c.kerberosClient.GetServiceTicket(spn)
 	if err != nil {
 		return spnego.NegTokenInit{}, key, err
