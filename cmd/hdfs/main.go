@@ -174,10 +174,10 @@ func fatalWithUsage(msg ...interface{}) {
 }
 
 func getClient(namenode string) (*hdfs.Client, error) {
-	if cachedClients[namenode] != nil {
-		return cachedClients[namenode], nil
-	}
-
+	//if cachedClients[namenode] != nil {
+	//	return cachedClients[namenode], nil
+	//}
+	fmt.Printf("got params as %s", namenode)
 	if namenode == "" {
 		namenode = os.Getenv("HADOOP_NAMENODE")
 	}
@@ -186,6 +186,8 @@ func getClient(namenode string) (*hdfs.Client, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Problem loading configuration: %s", err)
 	}
+
+	fmt.Printf("conf loaded from env %+v", conf)
 
 	options := hdfs.ClientOptionsFromConf(conf)
 	if namenode != "" {
@@ -197,6 +199,7 @@ func getClient(namenode string) (*hdfs.Client, error) {
 	}
 
 	if options.KerberosClient != nil {
+		fmt.Printf("getting kerberosclient")
 		options.KerberosClient, err = getKerberosClient()
 		if err != nil {
 			return nil, fmt.Errorf("Problem with kerberos authentication: %s", err)
@@ -226,6 +229,20 @@ func getClient(namenode string) (*hdfs.Client, error) {
 	c, err := hdfs.NewClient(options)
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't connect to namenode: %s", err)
+	}
+
+	fmt.Printf("Connected to named node with client options %+v", options)
+
+	_, statErr := c.Stat("/$")
+
+	if pathError, ok := statErr.(*os.PathError); statErr == nil || ok && (pathError.Err == os.ErrNotExist) {
+		fmt.Printf("connection success")
+
+		// Succesfully connected
+		return c, nil
+	} else {
+		c.Close()
+		return nil, statErr
 	}
 
 	cachedClients[namenode] = c
