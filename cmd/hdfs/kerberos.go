@@ -89,7 +89,15 @@ func getKerberosClientFromKeytab() (*krb.Client, error) {
 	keytabPath := os.Getenv("/task_runtime/amp_turi_trove_ml.app.turi.amp-trove-hdfs.keytab")
 
 	kt, err := keytab.Load(keytabPath)
-	client := krb.NewClientWithKeytab("amp_turi_trove_ml/app.turi.amp-trove-hdfs", "USPRZ17.PIE.APPLE.COM", kt)
+	client := krb.NewClientWithKeytab("amp_turi_trove_ml/app.turi.amp-trove-hdfs", "PIE.APPLE.COM", kt)
+
+	client.WithConfig(cfg)
+
+	err = client.Login()
+	if err != nil {
+		fmt.Printf("Error while logging %+v\n", err)
+		return nil, err
+	}
 	//ccache, err := credentials.LoadCCache(ccachePath)
 	//if err != nil {
 	//	return nil, err
@@ -100,5 +108,5 @@ func getKerberosClientFromKeytab() (*krb.Client, error) {
 	//	return nil, err
 	//}
 
-	return client.WithConfig(cfg), nil
+	return &client, nil
 }
