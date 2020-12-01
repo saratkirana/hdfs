@@ -48,6 +48,9 @@ func getKerberosClient() (*krb.Client, error) {
 		return nil, err
 	}
 
+	fmt.Printf("Ccahe is first %+v", ccache)
+	fmt.Printf("Ccahe is second %+v", ccache.DefaultPrincipal)
+
 	client, err := krb.NewFromCCache(ccache, cfg)
 	if err != nil {
 		return nil, err
