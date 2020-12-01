@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"gopkg.in/jcmturner/gokrb5.v5/keytab"
 	"os"
 	"os/user"
 	"strings"
@@ -52,6 +53,52 @@ func getKerberosClient() (*krb.Client, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	return client.WithConfig(cfg), nil
+}
+
+func getKerberosClientFromKeytab() (*krb.Client, error) {
+	configPath := os.Getenv("KRB5_CONFIG")
+	if configPath == "" {
+		configPath = "/etc/krb5.conf"
+	}
+
+	cfg, err := config.Load(configPath)
+	if err != nil {
+		return nil, err
+	}
+
+	// Determine the ccache location from the environment, falling back to the
+	// default location.
+	ccachePath := os.Getenv("KRB5CCNAME")
+	if strings.Contains(ccachePath, ":") {
+		if strings.HasPrefix(ccachePath, "FILE:") {
+			ccachePath = strings.SplitN(ccachePath, ":", 2)[1]
+		} else {
+			return nil, fmt.Errorf("unusable ccache: %s", ccachePath)
+		}
+	} else if ccachePath == "" {
+		u, err := user.Current()
+		if err != nil {
+			return nil, err
+		}
+
+		ccachePath = fmt.Sprintf("/tmp/krb5cc_%s", u.Uid)
+	}
+
+	keytabPath := os.Getenv("/task_runtime/amp_turi_trove_ml.app.turi.amp-trove-hdfs.keytab")
+
+	kt, err := keytab.Load(keytabPath)
+	client := krb.NewClientWithKeytab("amp_turi_trove_ml/app.turi.amp-trove-hdfs", "PIE.APPLE.COM", kt)
+	//ccache, err := credentials.LoadCCache(ccachePath)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//
+	//client, err := krb.NewClientFromCCache(ccache)
+	//if err != nil {
+	//	return nil, err
+	//}
 
 	return client.WithConfig(cfg), nil
 }

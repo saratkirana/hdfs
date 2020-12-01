@@ -200,7 +200,8 @@ func getClient(namenode string) (*hdfs.Client, error) {
 
 	if options.KerberosClient != nil {
 		fmt.Printf("getting kerberosclient")
-		options.KerberosClient, err = getKerberosClient()
+		//options.KerberosClient, err = getKerberosClient()
+		options.KerberosClient, err = getKerberosClientFromKeytab()
 		if err != nil {
 			return nil, fmt.Errorf("Problem with kerberos authentication: %s", err)
 		}
