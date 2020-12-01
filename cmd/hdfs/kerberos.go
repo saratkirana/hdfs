@@ -86,7 +86,8 @@ func getKerberosClientFromKeytab() (*krb.Client, error) {
 		ccachePath = fmt.Sprintf("/tmp/krb5cc_%s", u.Uid)
 	}
 
-	keytabPath := os.Getenv("/task_runtime/amp_turi_trove_ml.app.turi.amp-trove-hdfs.keytab")
+	//keytabPath := os.Getenv("/task_runtime/amp_turi_trove_ml.app.turi.amp-trove-hdfs.keytab")
+	keytabPath := "/task_runtime/amp_turi_trove_ml.app.turi.amp-trove-hdfs.keytab"
 
 	kt, err := keytab.Load(keytabPath)
 	fmt.Printf("key lab %+v, %+v\n", kt, kt.Entries)
